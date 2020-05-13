@@ -103,12 +103,6 @@ export class PrinterRRF3 extends Printer implements IPrinter {
                     this._reconnectTask = null;
                 }
             }
-            /*else if (!this._reconnectTask) {
-                this._reconnectTask = setTimeout(() => {
-                    this._reconnectTask = null;
-                    this._reconnect();
-                }, 1000);
-            }*/
         }
         this._isOnline = value;
     }
@@ -126,19 +120,6 @@ export class PrinterRRF3 extends Printer implements IPrinter {
 
     private _error(e: string) {
         this.eventAggregator.publish(Messages.MESSAGE_PRINTER_ERROR, [e]);
-    }
-
-    private _errors(list: string[]) {
-        this.eventAggregator.publish(Messages.MESSAGE_PRINTER_ERROR, list);
-    }
-
-    private _toQueryString(obj: any): string {
-        var str = [];
-        for (var p in obj)
-            if (obj.hasOwnProperty(p) && obj[p] != undefined) {
-                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-            }
-        return str.join("&");
     }
 
     private async _connect(): Promise<void> {
@@ -167,8 +148,6 @@ export class PrinterRRF3 extends Printer implements IPrinter {
     }
 
     private async _reconnect(): Promise<void> {
-		// TODO: Cancel pending requests
-
 		// Attempt to reconnect
         const _self = this;
 		await new Promise(function(resolve, reject) {
@@ -195,7 +174,6 @@ export class PrinterRRF3 extends Printer implements IPrinter {
 					// DCS unavailable or incompatible DCS version
 					reject(new Error('PrinterOffline', e.reason));
 				} else {
-					// TODO accomodate InvalidPasswordError and NoFreeSessionError here
 					reject(new Error('NetworkError', e.reason));
                 }
                 _self._onClose();
@@ -227,15 +205,11 @@ export class PrinterRRF3 extends Printer implements IPrinter {
     }
 
     private _doPing() {
-        // Although the WebSocket standard is supposed to provide PING frames,
-        // there is no way to send them since a WebSocket instance does not provide a method for that.
-        // Hence we rely on our own optional PING-PONG implementation
         this._socket.send('PING\n');
         this._pingTask = undefined;
     }
 
     private async _onMessage(e: any): Promise<void> {
-        // Don't do anything if the connection has been terminated...
         if (this._socket == null) {
             return;
         }
@@ -272,9 +246,6 @@ export class PrinterRRF3 extends Printer implements IPrinter {
                         break;
                 }
 
-                // TODO Pass supplied date/time from the messages here
-                //await this.dispatch('onCodeCompleted', { code: undefined, reply });
-
             }, this);
             delete data.messages;
         }
@@ -299,8 +270,6 @@ export class PrinterRRF3 extends Printer implements IPrinter {
     }
 
     private _onClose() {
-        // TODO: Cancel pending requests
-
         if (this._pingTask) {
             clearTimeout(this._pingTask);
             this._pingTask = undefined;
