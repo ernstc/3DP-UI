@@ -1,0 +1,49 @@
+<template>
+    <div id="screenNumericKeypad" class="screen overlay ${isHidden ? 'offscreen' : ''}">
+        <div class="title">
+            <i class="icon-back" click.delegate="clickedCancel()"></i>
+            <i class="icon-accept" click.delegate="clickedAccept()"></i>
+            <span>${title}</span>
+        </div>
+        <div class="content">
+
+            <table>
+                <tr>
+                    <td colspan="4" class="result">
+                        <span>${display}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="command" click.delegate="_ce_clicked()">CE</td>
+                    <td class="command" click.delegate="_c_clicked()">C</td>
+                    <td class="command" click.delegate="_back_clicked()">&lt;X</td>
+                    <td class="command ${operator == '/' ? 'selected': ''}" click.delegate="_operator_clicked('/')">/</td>
+                </tr>
+                <tr>
+                    <td click.delegate="_digit_clicked('7')">7</td>
+                    <td click.delegate="_digit_clicked('8')">8</td>
+                    <td click.delegate="_digit_clicked('9')">9</td>
+                    <td class="command ${operator == '*' ? 'selected': ''}" click.delegate="_operator_clicked('*')">*</td>
+                </tr>
+                <tr>
+                    <td click.delegate="_digit_clicked('4')">4</td>
+                    <td click.delegate="_digit_clicked('5')">5</td>
+                    <td click.delegate="_digit_clicked('6')">6</td>
+                    <td class="command ${operator == '-' ? 'selected': ''}" click.delegate="_operator_clicked('-')">-</td>
+                </tr>
+                <tr>
+                    <td click.delegate="_digit_clicked('1')">1</td>
+                    <td click.delegate="_digit_clicked('2')">2</td>
+                    <td click.delegate="_digit_clicked('3')">3</td>
+                    <td class="command ${operator == '+' ? 'selected': ''}" click.delegate="_operator_clicked('+')">+</td>
+                </tr>
+                <tr>
+                    <td click.delegate="_sign_clicked()">+/-</td>
+                    <td click.delegate="_digit_clicked('0')">0</td>
+                    <td click.delegate="_decimal_clicked()">,</td>
+                    <td class="command" click.delegate="_equal_clicked()">=</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</template>

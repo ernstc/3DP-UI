@@ -1,0 +1,73 @@
+<template>
+    <div id="screenSettings" class="screen">
+        <div class="buttons-row">
+            <div class="button square double emergency" click.delegate="clickedEmergencyStop()">
+                <span class="label">Emergency<br />STOP</span>
+            </div>
+            <div class="button empty" if.bind="v12 == undefined"></div>
+            <div class="button square disabled">
+                <span class="label">Vin</span>
+                <span class="value">${vin}</span>
+            </div>
+            <div class="button square disabled" if.bind="v12 != undefined">
+                <span class="label">V12</span>
+                <span class="value">${v12}</span>
+            </div>
+            <!-- <div class="button square double language disabled">
+                <span class="label">Language</span>
+                <span class="value">${language}</span>
+            </div> -->
+        </div>
+        <div class="buttons-row">
+            <div class="button square zoffset disabled">
+                <span class="label">Z</span>
+                <span class="unit">offset</span>
+                <span class="value">${zOffset}</span>
+            </div>
+            <div class="button square disabled">
+                <span class="label">MCU</span>
+                <span class="unit">°C</span>
+                <span class="value">${mcuTemp}</span>
+            </div>
+            <div class="button square fan disabled">
+                <i class="icon-fan ${mcuFan > 0 ? 'rotating-icon' : ''}"></i>
+                <span class="label">Fan</span>
+                <span class="value">${mcuFan}%</span>
+            </div>
+            <div class="button empty"></div>
+        </div>
+        <table class="info">
+            <tr>
+                <td>Printer:</td>
+                <td class="value">${infoPrinterName}</td>
+            </tr>
+            <tr>
+                <td>Electronics:</td>
+                <td class="value">${infoElectronics}</td>
+            </tr>
+            <tr>
+                <td>Firmware:</td>
+                <td class="value">${infoFirmware}</td>
+            </tr>
+            <tr>
+                <td>Version:</td>
+                <td class="value">${infoFirmwareVersion}</td>
+            </tr>
+            <tr if.bind="infoWiFiVersion">
+                <td>WifFi Server:</td>
+                <td class="value">${infoWiFiVersion}</td>
+            </tr>
+            <tr if.bind="infoDsfVersion">
+                <td>DSF Version:</td>
+                <td class="value">${infoDsfVersion}</td>
+            </tr>
+            <tr>
+                <td>3DP UI ver.:</td>
+                <td class="value">${infoUIVersion}</td>
+            </tr>
+        </table>
+        <div class="copyright">
+            ${year} &copy; Ernesto Cianciotta
+        </div>
+    </div>
+</template>

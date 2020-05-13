@@ -1,0 +1,24 @@
+<template>
+    <div id="screenEditZBabystepping" class="dialog size3-1 ${isHidden ? 'hidden' : ''}">
+        <div class="values">
+            <div class="buttons-row">
+                <div class="button extra-small ${level == 0 ? 'selected' : ''}" click.delegate="level = 0">+${levels[0].toFixed(2)}</div>
+                <div class="button extra-small ${level == 1 ? 'selected' : ''}" click.delegate="level = 1">+${levels[1].toFixed(2)}</div>
+                <div class="button extra-small ${level == 2 ? 'selected' : ''}" click.delegate="level = 2">+${levels[2].toFixed(2)}</div>
+            </div>
+            <div class="buttons-row">
+                <div class="button extra-small ${level == 0 ? 'selected' : ''}" click.delegate="level = 0">-${levels[0].toFixed(2)}</div>
+                <div class="button extra-small ${level == 1 ? 'selected' : ''}" click.delegate="level = 1">-${levels[1].toFixed(2)}</div>
+                <div class="button extra-small ${level == 2 ? 'selected' : ''}" click.delegate="level = 2">-${levels[2].toFixed(2)}</div>
+            </div>
+        </div>
+        <div class="buttons-col">
+            <div class="button-add" click.delegate="clickedAdd()">
+                <i class="icon-move-up"></i>
+            </div>
+            <div class="button-remove" click.delegate="clickedRemove()">
+                <i class="icon-move-down"></i>
+            </div>
+        </div>
+    </div>
+</template>

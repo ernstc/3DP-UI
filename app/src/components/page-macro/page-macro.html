@@ -1,0 +1,23 @@
+<template>
+    <div id="screenMacro" class="screen">
+        <div class="title">
+            <span class="pageTitle">Macro</span>
+            <span class="path">./${currentDir}</span>
+            <i class="icon-parent parent-path" show.bind="!isRootFolder" click.delegate="clickedParent()"></i>
+        </div>
+        <div class="filesViewport">
+            <div class="filesWrapper" ref="macroWrapper">
+                <div class="scroller filesScroller">
+                    <div class="button file" repeat.for="name of files" click.delegate="executeMacro(name)">
+                        <span class="fileName">${name}</span>
+                        <i class="icon-play-macro"></i>
+                    </div>
+                    <div class="button folder" repeat.for="name of folders" click.delegate="openFolder(name)">
+                        <i class="icon-folder"></i>
+                        <span class="fileName">${name}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

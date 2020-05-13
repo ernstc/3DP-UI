@@ -1,0 +1,46 @@
+<template>
+    <div id="screenHome" class="screen">
+        <div class="buttons-row">
+            <div class="button square ${xSelected ? 'selected' : ''} ${xHomed ? '' : 'not-ready'}" click.delegate="clickedX()">
+                <span class="label">X</span>
+                <span class="value">${x}</span>
+            </div>
+            <div class="button square ${ySelected ? 'selected' : ''} ${yHomed ? '' : 'not-ready'}" click.delegate="clickedY()">
+                <span class="label">Y</span>
+                <span class="value">${y}</span>
+            </div>
+            <div class="button square ${zSelected ? 'selected' : ''} ${zHomed ? '' : 'not-ready'}" click.delegate="clickedZ()">
+                <span class="label">Z</span>
+                <span class="value">${z}</span>
+            </div>
+            <div class="button square home ${homeNeeded ? 'default' : ''}" click.delegate="clickedHome()">
+                <i class="icon-home"></i>
+                <span class="label">${homeAxis}</span>
+            </div>
+        </div>
+        <div class="buttons-row">
+            <div class="button square bed ${bedSelected ? 'selected' : ''}" click.delegate="clickedBed()">
+                <i class="icon-heated-bed"></i>
+                <span class="unit">°C</span>
+                <span class="status">${bedStatus}</span>
+                <span class="value">${bedTemp}</span>
+            </div>
+            <div class="button square ${toolSelected ? 'selected' : ''}" click.delegate="clickedTool()">
+                <span class="label">${toolName}</span>
+                <span class="unit">°C</span>
+                <span class="status">${toolStatus}</span>
+                <span class="value">${toolTemp}</span>
+            </div>
+            <div class="button square empty">
+            </div>
+            <div class="button square fan" click.delegate="clickedFan()">
+                <i class="icon-fan ${fan > 0 ? 'rotating-icon' : ''}"></i>
+                <span class="label">Fan</span>
+                <span class="value">${fan}%</span>
+            </div>
+        </div>
+        <div class="graph">
+            <canvas ref="graphTemperatures" class="graphTemperatures"></canvas>
+        </div>
+    </div>
+</template>

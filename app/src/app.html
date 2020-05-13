@@ -1,0 +1,72 @@
+<template>
+    <require from="./style/fonts/fonts.css"></require>
+    <require from="./style/Chart.min.css"></require>
+    <require from="./style/style.less"></require>
+    <require from="./style/icons.less"></require>
+
+    <require from="./screen-error.html"></require>
+    <require from="./screen-offline.html"></require>
+
+    <require from="./components/page-settings/page-settings"></require>
+    <require from="./components/page-home/page-home"></require>
+    <require from="./components/page-job/page-job"></require>
+    <require from="./components/page-macro/page-macro"></require>
+    <require from="./components/page-files/page-files"></require>
+
+    <require from="./components/screen-edit-tool/screen-edit-tool"></require>
+    <require from="./components/screen-move-tool/screen-move-tool"></require>
+    <require from="./components/screen-edit-bed/screen-edit-bed"></require>
+    <require from="./components/screen-edit-bed-mesh/screen-edit-bed-mesh"></require>
+    <require from="./components/screen-edit-axis/screen-edit-axis"></require>
+    <require from="./components/screen-edit-z-babystepping/screen-edit-z-babystepping"></require>
+    <require from="./components/screen-numeric-keypad/screen-numeric-keypad"></require>
+    <require from="./components/screen-gcode-file/screen-gcode-file"></require>
+    <require from="./components/screen-model/screen-model"></require>
+
+    <div ref="display" class="display">
+        <div class="viewport ${isPrinterOffline || printerErrors != null ? 'blur' : ''}">
+            <div id="pagesWrapper">
+                <div id="pagesScroller" class="scroller">
+                    <div class="page">
+                        <page-settings view-model.ref="pageSettings"></page-settings>
+                    </div>
+                    <div class="page">
+                        <page-home view-model.ref="pageHome"></page-home>
+                    </div>
+                    <div class="page">
+                        <page-job view-model.ref="pageJob"></page-job>
+                    </div>
+                    <div class="page">
+                        <page-macro view-model.ref="pageMacro"></page-macro>
+                    </div>
+                    <div class="page">
+                        <page-files view-model.ref="pageFiles"></page-files>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pager" class="page-${pageIndex}">
+                <div class="pager">
+                    <i class="icon-settings-page pageSettings"></i>
+                    <div class="page-1"></div>
+                    <div class="page-2"></div>
+                    <div class="page-3"></div>
+                    <div class="page-4"></div>
+                </div>
+            </div>
+
+            <screen-edit-tool view-model.ref="screenEditTool"></screen-edit-tool>
+            <screen-move-tool view-model.ref="screenMoveTool"></screen-move-tool>
+            <screen-edit-bed view-model.ref="screenEditBed"></screen-edit-bed>
+            <screen-edit-bed-mesh view-model.ref="screenEditBedMesh"></screen-edit-bed-mesh>
+            <screen-edit-axis view-model.ref="screenEditAxis"></screen-edit-axis>
+            <screen-edit-z-babystepping view-model.ref="screenEditZBabystepping"></screen-edit-z-babystepping>
+            <screen-numeric-keypad view-model.ref="screenNumericKeypad"></screen-numeric-keypad>
+            <screen-gcode-file view-model.ref="screenGcodeFile"></screen-gcode-file>
+            <screen-model view-model.ref="screenModel"></screen-model>
+
+        </div>
+        <screen-offline show.bind="isPrinterOffline"></screen-offline>
+        <screen-error show.bind="printerErrors != null" errors.bind="printerErrors"></screen-error>
+    </div>
+</template>

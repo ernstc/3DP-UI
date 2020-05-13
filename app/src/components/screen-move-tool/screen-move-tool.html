@@ -1,0 +1,34 @@
+<template>
+    <div id="screenMoveTool" class="screen overlay ${isHidden ? 'offscreen' : ''}">
+        <div class="title">
+            <i class="icon-extruder title-icon"></i>
+            <i class="icon-back" click.delegate="clickedCancel()"></i>
+            <span>${temperature}</span>
+            <span>${title}</span>
+        </div>
+        <div class="content">
+            <div class="buttons-col">
+                <h1>Length</h1>
+                <div repeat.for="v of lengthValues" class="button small ${length == v ? 'selected' : ''}" click.delegate="length = v">
+                    <span class="value">${v}</span>
+                </div>
+            </div>
+            <div class="buttons-col">
+                <h1>mm/min</h1>
+                <div repeat.for="v of speedValues" class="button small ${speed == v ? 'selected' : ''}" click.delegate="speed = v">
+                    <span class="value">${v}</span>
+                </div>
+            </div>
+            <div class="buttons-col">
+                <div class="button-retract ${canRetract ? '' : 'disabled'}" click.delegate="clickedRetract()">
+                    <i class="icon-move-up"></i>
+                    <span>Retract</span>
+                </div>
+                <div class="button-extrude ${canExtrude ? '' : 'disabled'}" click.delegate="clickedExtrude()">
+                    <i class="icon-move-down"></i>
+                    <span>Extrude</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

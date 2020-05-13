@@ -1,0 +1,11 @@
+<template>
+    <div id="screenModel" class="screen overlay ${isHidden ? 'offscreen' : ''}">
+        <div class="title">
+            <i class="icon-back" click.delegate="clickedCancel()"></i>
+            <span class="pageTitle">${title}</span>
+            <span class="file-name">${fileName}</span>
+        </div>
+        <div ref="container" class="content"></div>
+        <div class="overlay" if.bind="!isReady">Loading...</div>
+    </div>
+</template>

@@ -1,0 +1,22 @@
+<template>
+    <div id="screenGCodeFile" class="screen overlay ${isHidden ? 'offscreen' : ''}">
+        <div class="title">
+            <i class="icon-back" click.delegate="clickedCancel()"></i>
+            <span class="file-name">${name}</span>
+        </div>
+        <div class="content">
+            <div class="button file default" click.delegate="start()">
+                <span class="fileName">Start Printing</span>
+                <i class="icon-play-file"></i>
+            </div>
+            <div class="button file" click.delegate="clickedSimulate()">
+                <span class="fileName">Simulate</span>
+                <i class="icon-simulate-file"></i>
+            </div>
+            <div class="button file" click.delegate="clickedPreview3D()">
+                <span class="fileName">3D Preview</span>
+                <i class="icon-model"></i>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,2 @@
+window['PRINTER_URL'] = PRINTER_URL;
+

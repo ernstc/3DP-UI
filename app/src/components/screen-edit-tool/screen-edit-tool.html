@@ -1,0 +1,29 @@
+<template>
+    <div id="screenEditTool" class="dialog size2 ${isHidden ? 'hidden' : ''}">
+        <div class="buttons-row">
+            <div class="button square icon" click.delegate="clickedMoveTool()">
+                <i class="icon-edit-extruder"></i>
+            </div>
+            <div class="buttons-col">
+                <div class="button small ${state == 2 ? 'selected' : ''}" click.delegate="clickedActive()">
+                    <span class="label">active</span>
+                </div>
+                <div class="button small ${state == 1 ? 'selected' : ''} ${state == 0 ? 'disabled' : ''}" click.delegate="clickedStandby()">
+                    <span class="label">standby</span>
+                </div>
+                <div class="button small ${state == 0 ? 'selected' : ''}" click.delegate="clickedOff()">
+                    <span class="label">off</span>
+                </div>
+            </div>
+            <div class="buttons-col">
+                <div class="button medium" click.delegate="editTempActive()">
+                    <span class="value">${tempActive} °C</span>
+                </div>
+                <div class="button medium" click.delegate="editTempStandby()">
+                    <span class="value">${tempStandby} °C</span>
+                </div>
+            </div>
+            <div class="button empty short"></div>
+        </div>
+    </div>
+</template>

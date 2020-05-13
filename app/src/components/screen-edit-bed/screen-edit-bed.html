@@ -1,0 +1,29 @@
+<template>
+    <div id="screenEditBed" class="dialog size2 ${isHidden ? 'hidden' : ''}">
+        <div class="buttons-row">
+            <div class="buttons-col">
+                <div class="button small ${state == 2 ? 'selected' : ''}" click.delegate="clickedActive()">
+                    <span class="label">active</span>
+                </div>
+                <div class="button small ${state == 1 ? 'selected' : ''}" click.delegate="clickedStandby()">
+                    <span class="label">standby</span>
+                </div>
+                <div class="button small ${state == 0 ? 'selected' : ''}" click.delegate="clickedOff()">
+                    <span class="label">off</span>
+                </div>
+            </div>
+            <div class="buttons-col">
+                <div class="button medium" click.delegate="editTempActive()">
+                    <span class="value">${tempActive} °C</span>
+                </div>
+                <div class="button medium" click.delegate="editTempStandby()" show.bind="false">
+                    <span class="value">${tempStandby} °C</span>
+                </div>
+            </div>
+            <div class="button empty short"></div>
+            <div class="button square icon ${autoBedLevelingEnabled ? 'on' : 'off'}" click.delegate="clickedBedMesh()">
+                <i class="icon-mesh"></i>
+            </div>
+        </div>
+    </div>
+</template>

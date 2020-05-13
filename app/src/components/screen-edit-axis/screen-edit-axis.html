@@ -1,0 +1,17 @@
+<template>
+    <div id="screenEditAxis" class="dialog size3 ${isHidden ? 'hidden' : ''}">
+        <div class="buttons-row">
+            <div repeat.for="v of values" class="button small ${selectedValue == v ? 'selected' : ''}" click.delegate="clickedValue(v)">
+                <span class="value">${v}</span>
+            </div>
+        </div>
+        <div class="buttons-row">
+            <div class="button-backward" click.delegate="clickedMoveBackward()">
+                <i class="icon-move-left"></i>
+            </div>
+            <div class="button-forward" click.delegate="clickedMoveForward()">
+                <i class="icon-move-right"></i>
+            </div>
+        </div>
+    </div>
+</template>

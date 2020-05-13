@@ -1,0 +1,105 @@
+@s: 3em;
+@colors: #1FBCD3, #CBE2B4, #F6B6CA;
+
+@duration: 6s;
+@steps: 12;
+@delayPerc: 50;
+@fixed-duration: if((@delayPerc > 0), 100 / @delayPerc * @duration, @duration);
+
+.loading {
+
+    *, *:before, *:after{
+        box-sizing: border-box;
+    }
+    .cbox() {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .fbox() {
+        .cbox();
+        width: 100%;
+        height: 100%;
+    }
+    .container{
+        .cbox();
+        transform-style: preserve-3d;
+        perspective: 2000px;
+        transform: rotateX(-30deg) rotateY(-45deg);
+    }
+    .holder{
+        .cbox();
+        transform-style: preserve-3d;
+        transform: translate3d(0em, @s, @s*.5);
+        &:last-child{
+            transform: rotateY(-90deg) rotateX(90deg) translate3d(0, @s, @s*.5);
+        }
+        &:first-child{
+            transform: rotateZ(-90deg) rotateX(-90deg) translate3d(0, @s, @s*.5);
+        }
+        each(range(3), {
+            @color: extract(@colors,@value);
+            &:nth-child(@{value}){
+                .box{
+                    background-color: @color;
+                    &:before{
+                        background-color: darken(@color,20);
+                    }
+                    &:after{
+                        background-color: darken(@color,10);
+                    }
+                }
+            }
+        });
+    }
+    .box{
+        .cbox();
+        transform-style: preserve-3d;
+        animation: loading-ani-box @fixed-duration infinite 0s;
+        width: @s;
+        height: @s;
+        &:before, &:after{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            content: "";
+        }
+        &:before{
+            left: 100%;
+            bottom: 0;
+            transform: rotateY(90deg);
+            transform-origin: 0 50%;
+        }
+        &:after{
+            left: 0;
+            bottom: 100%;
+            transform: rotateX(90deg);
+            transform-origin: 0 100%;
+        }
+    }
+
+    .t(@index, @t: white) {
+        @step:  ((100 - @delayPerc) / 100) / @steps;
+        @perc: floor(@index * @step * 10000) / 100;
+        @kfSel: percentage(@perc / 100);
+        @{kfSel} {
+            transform: @t;
+        }
+    }    
+
+    @keyframes loading-ani-box {
+        .t(1, translate3d(-50%,-50%,0) scaleZ(2));
+        .t(2, translate3d(-50%,-50%,-@s) scaleZ(1));
+        .t(3, translate3d(-50%,-100%,-@s) scaleY(2));
+        .t(4, translate3d(-50%,-150%,-@s) scaleY(1));
+        .t(5, translate3d(-100%,-150%,-@s) scaleX(2));
+        .t(6, translate3d(-150%,-150%,-@s) scaleX(1));
+        .t(7, translate3d(-150%,-150%, 0) scaleZ(2));
+        .t(8, translate3d(-150%,-150%,0) scaleZ(1));
+        .t(9, translate3d(-150%,-100%,0) scaleY(2));
+        .t(10, translate3d(-150%,-50%,0) scaleY(1));
+        .t(11, translate3d(-100%,-50%,0) scaleX(2));
+        .t(12, translate3d(-50%,-50%,0) scaleX(1));
+    }
+}

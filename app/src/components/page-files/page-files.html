@@ -1,0 +1,22 @@
+<template>
+    <div id="screenFiles" class="screen">
+        <div class="title">
+            <span class="pageTitle">Files</span>
+            <span class="path">./${currentDir}</span>
+            <i class="icon-parent parent-path" show.bind="!isRootFolder" click.delegate="clickedParent()"></i>
+        </div>
+        <div class="filesViewport">
+            <div class="filesWrapper" ref="filesWrapper">
+                <div class="scroller filesScroller">
+                    <div class="button file" repeat.for="name of files" click.delegate="openFile(name)">
+                        <span class="fileName">${name}</span>
+                    </div>
+                    <div class="button folder" repeat.for="name of folders" click.delegate="openFolder(name)">
+                        <i class="icon-folder"></i>
+                        <span class="fileName">${name}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,62 @@
+<template>
+    <div id="screenJob" class="screen">
+        <div class="title">
+            <span class="pageTitle">${title}</span>
+            <span class="file-name">${fileName}</span>
+        </div>
+        <div class="buttons-row">
+            <div class="button square job-pause ${isStatusIdle ? 'disabled' : ''}" show.bind="showPauseButton" click.delegate="clickedPause()">
+                <span class="label">Pause</span>
+                <i class="icon-job-pause"></i>
+            </div>
+            <div class="button square job-resume" show.bind="showResumeButton" click.delegate="clickedResume()">
+                <span class="label">Resume</span>
+                <i class="icon-job-resume"></i>
+            </div>
+            <div class="button square job-cancel" show.bind="showCancelButton" click.delegate="clickedCance()">
+                <span class="label">Cancel</span>
+                <i class="icon-job-cancel"></i>
+            </div>
+            <div class="button square job-restart" show.bind="showRestartButton" click.delegate="clickedRestart()">
+                <span class="label">Restart</span>
+                <i class="icon-job-restart"></i>
+            </div>
+            <div class="button square empty" show.bind="showEmptyButton"></div>
+            <div class="button square z-babystepping ${editingZBabystepping ? 'selected' : ''}" click.delegate="clickedZBabystepping()">
+                <span class="label">Z</span>
+                <span class="unit">offset</span>
+                <span class="status">baby stepping</span>
+                <span class="value">${zBabystepping}</span>
+            </div>
+            <div class="button square icon ${existsModel ? '' : 'disabled'}" click.delegate="clickedModel()">
+                <i class="icon-model"></i>
+            </div>
+        </div>
+        <div class="buttons-row">
+            <div class="button square factor" click.delegate="clickedSpeedFactor()">
+                <span class="label">Speed</span>
+                <span class="status">factor</span>
+                <span class="value">${speedFactor}%</span>
+            </div>
+            <div class="button square factor" click.delegate="clickedExtrusionFactor()">
+                <span class="label">${toolName}</span>
+                <span class="status">factor</span>
+                <span class="value">${extrusionFactor}%</span>
+            </div>
+            <div class="button square factor" show.bind="showLayers">
+                <span class="label">Layer</span>
+                <span class="status">${layersCount}</span>
+                <span class="value">${currentLayer}</span>
+            </div>
+            <div class="button square empty" show.bind="!showLayers"></div>
+            <div class="button square fan" click.delegate="clickedFan()">
+                <i class="icon-fan ${fan > 0 ? 'rotating-icon' : ''}"></i>
+                <span class="label">Fan</span>
+                <span class="value">${fan}%</span>
+            </div>
+        </div>
+        <div class="graph">
+            <canvas id="graphLayers" ref="graphLayers"></canvas>
+        </div>
+    </div>
+</template>

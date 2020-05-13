@@ -1,0 +1,9 @@
+<template bindable="errors">
+    <div id="screenPrinterError" class="viewport screen">
+        <div class="bk"></div>
+        <div class="message">
+            <p repeat.for="error of errors">${error}</p>
+            ${error}
+        </div>
+    </div>
+</template>

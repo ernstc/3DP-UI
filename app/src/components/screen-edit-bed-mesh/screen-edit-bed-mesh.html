@@ -1,0 +1,53 @@
+<template>
+    <div id="screenEditBedMesh" class="screen overlay ${isHidden ? 'offscreen' : ''}">
+        <div class="title">
+            <i class="icon-mesh title-icon"></i>
+            <i class="icon-back" click.delegate="clickedCancel()"></i>
+            <span>Bed Mesh</span>
+        </div>
+        <div class="buttons-row">
+            <div class="button square status ${autoBedLevelingEnabled ? 'on' : 'off'}" click.delegate="clickedAutoBedLevelingSwitch()">
+                <span class="label">${autoBedLevelingEnabled ? 'ON' : 'OFF'}</span>
+            </div>
+            <div class="button square" click.delegate="clickedRunMeshBedCompensation()">
+                <span class="label">Run</span>
+            </div>
+            <div class="button empty"></div>
+            <div class="button square ${showingInfo ? 'selected' : ''}" click.delegate="showingInfo = !showingInfo">
+                <span class="label">Info</span>
+            </div>
+        </div>
+        <table class="info">
+            <tr>
+                <td>Probe points:</td>
+                <td class="value">${probePoints}</td>
+            </tr>
+            <tr>
+                <td>Area:</td>
+                <td class="value">${area} cm<sup>2</sup></td>
+            </tr>
+            <tr>
+                <td>Max deviation:</td>
+                <td class="value">${maxDeviationLow} / ${maxDeviationHigh} mm</td>
+            </tr>
+            <tr>
+                <td>Mean error:</td>
+                <td class="value">${meanError} mm</td>
+            </tr>
+            <tr>
+                <td>RMS error:</td>
+                <td class="value">${rmsError} mm</td>
+            </tr>
+        </table>
+        <div class="bed-mesh ${showingInfo ? 'hidden' : ''}">
+            <div ref="container" class="bed_mesh_canvas"></div>
+            <canvas ref="legend" class="bed_mesh_legend"></canvas>
+            <div class="bed-mesh-overlay" if.bind="showingInfo"></div>
+        </div>
+        <div ref="tooltip" class="bed_mesh_tooltip" show.bind="tooltipVisible">
+            <span>x: ${tooltipX}</span>
+            <span>y: ${tooltipY}</span>
+            <span>z: ${tooltipZ}</span>
+        </div>
+    </div>
+</template>
