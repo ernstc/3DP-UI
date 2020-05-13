@@ -4,7 +4,12 @@
     <meta charset="utf-8">
     <title><%- htmlWebpackPlugin.options.metadata.title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="apple-mobile-web-app-title" content="3D Printer">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <base href="<%- htmlWebpackPlugin.options.metadata.baseUrl %>">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="apple-touch-startup-image" href="apple-touch-launch.png" />
+
     <!-- imported CSS are concatenated and added automatically -->
   </head>
   <body aurelia-app="main">

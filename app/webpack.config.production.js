@@ -8,6 +8,7 @@ const project = require('./aurelia_project/aurelia.json');
 const { AureliaPlugin, ModuleDependenciesPlugin } = require('aurelia-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 
 // config helpers:
@@ -198,7 +199,7 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
         ...when(!tests, new CopyWebpackPlugin([
             { from: 'static', to: outDir, ignore: ['.*'] }])), // ignore dot (hidden) files
         ...when(analyze, new BundleAnalyzerPlugin()),
-        
+
         new webpack.DefinePlugin({
             PRINTER_HOSTNAME: 'undefined',
             PRINTER_URL: 'undefined',
@@ -211,7 +212,17 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
          * `del` (https://www.npmjs.com/package/del), or `rimraf` (https://www.npmjs.com/package/rimraf).
          */
         new CleanWebpackPlugin(),
-        
+
+        new CopyPlugin(
+            [
+                { 
+                    from: 'apple-touch-*.png', 
+                    //to: './dist',
+                    //toType: 'file'                    
+                },
+            ]
+        ),
+
         new CompressionPlugin({
             deleteOriginalAssets: false,
             filename: '[path].br[query]',
@@ -230,6 +241,7 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
             filename: '[path].gz[query]',
             algorithm: 'gzip',
             test: /\.(js|html|css|svg|woff2|png|ico)$/,
-        }) 
+        })
+
     ]
 });
