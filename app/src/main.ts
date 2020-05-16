@@ -2,7 +2,6 @@ import { Aurelia } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import * as environment from '../config/environment.json';
 import { PLATFORM } from 'aurelia-pal';
-import 'settings.js';
 import 'libraries/promise-timeout.js';
 import 'libraries/Chart.plugins.horizonalLinePlugin';
 import { WebClient } from './webClient';
@@ -22,6 +21,8 @@ export function configure(aurelia: Aurelia) {
     if (environment.testing) {
         aurelia.use.plugin(PLATFORM.moduleName('aurelia-testing'));
     }
+
+    console.log(environment);
 
     aurelia.start().then(() => aurelia.setRoot(PLATFORM.moduleName('app')));
 }

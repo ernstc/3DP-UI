@@ -1,6 +1,8 @@
 
+import * as environment from '../../config/environment.json'
 
-const PRINTER_URL = (<any>window).PRINTER_URL;
+const PRINTER_URL = environment.printerUrl;
+
 
 const PRINTER_HOSTNAME = typeof PRINTER_URL === 'string' 
     ? PRINTER_URL.substring(PRINTER_URL.indexOf('://') + 3, PRINTER_URL.lastIndexOf('/')) 
