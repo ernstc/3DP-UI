@@ -44,6 +44,8 @@ export class App {
 
     display: HTMLElement;
 
+    private _isFirstUpdate: boolean = true;
+
 
     constructor(
         private printer: IPrinter,
@@ -93,16 +95,28 @@ export class App {
     }
 
     private updateStatus() {
-        if (this.screenModel.isHidden || this.pageIndex == 2) {
-            switch (this.pageIndex) {
-                case 0: this.pageSettings.updateStatus(); break;
-                case 1: this.pageHome.updateStatus(); break;
-                case 2: this.pageJob.updateStatus(); break;
+        if (this._isFirstUpdate) {
+            this._isFirstUpdate = false;
+            this.pageHome.updateStatus();
+            this.pageSettings.updateStatus();
+            this.pageJob.updateStatus();
+            this.screenEditTool.updateStatus();
+            this.screenMoveTool.updateStatus();
+            this.screenEditBed.updateStatus();
+            this.screenEditBedMesh.updateStatus();
+        }
+        else {
+            if (this.screenModel.isHidden || this.pageIndex == 2) {
+                switch (this.pageIndex) {
+                    case 0: this.pageSettings.updateStatus(); break;
+                    case 1: this.pageHome.updateStatus(); break;
+                    case 2: this.pageJob.updateStatus(); break;
+                }
+                if (!this.screenEditTool.isHidden) this.screenEditTool.updateStatus();
+                if (!this.screenMoveTool.isHidden) this.screenMoveTool.updateStatus();
+                if (!this.screenEditBed.isHidden) this.screenEditBed.updateStatus();
+                if (!this.screenEditBedMesh.isHidden) this.screenEditBedMesh.updateStatus();
             }
-            if (!this.screenEditTool.isHidden) this.screenEditTool.updateStatus();
-            if (!this.screenMoveTool.isHidden) this.screenMoveTool.updateStatus();
-            if (!this.screenEditBed.isHidden) this.screenEditBed.updateStatus();
-            if (!this.screenEditBedMesh.isHidden) this.screenEditBedMesh.updateStatus();
         }
     }
 
