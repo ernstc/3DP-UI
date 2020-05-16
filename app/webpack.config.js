@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -16,7 +15,6 @@ const when = (condition, config, negativeConfig) =>
 
 // primary config:
 const title = '3DP UI';
-const printerUrl = 'http://127.0.0.1/';
 
 const outDir = path.resolve(__dirname, project.platform.output);
 const srcDir = path.resolve(__dirname, 'src');
@@ -199,11 +197,6 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
         ...when(!tests, new CopyWebpackPlugin([
             { from: 'static', to: outDir, ignore: ['.*'] }])), // ignore dot (hidden) files
         ...when(analyze, new BundleAnalyzerPlugin()),
-
-        new webpack.DefinePlugin({
-            PRINTER_HOSTNAME: JSON.stringify(printerUrl.substring(printerUrl.indexOf('://') + 3, printerUrl.lastIndexOf('/'))),
-            PRINTER_URL: JSON.stringify(printerUrl),
-        }),
 
         /**
          * Note that the usage of following plugin cleans the webpack output directory before build.
