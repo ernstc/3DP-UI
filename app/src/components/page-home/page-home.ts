@@ -29,7 +29,7 @@ export class PageHome implements IScreen {
     y: string = '0.00';
     z: string = '0.00';
     homeAxis: string = 'XYZ';
-    bedTemp: string = '0.0';
+    bedTemp: string = '';
     bedStatus: string = 'off';
     toolName: string = 'E0';
     toolTemp: string = '0.0';
@@ -40,6 +40,7 @@ export class PageHome implements IScreen {
     public ySelected: boolean = false;
     public zSelected: boolean = false;
     public bedSelected: boolean = false;
+    public bedEnabled: boolean = false;
     public toolSelected: boolean = false;
 
     xHomed: boolean = true;
@@ -84,7 +85,10 @@ export class PageHome implements IScreen {
         this.x = this.printer.view.axisCoord[0].toFixed(2);
         this.y = this.printer.view.axisCoord[1].toFixed(2);
         this.z = this.printer.view.axisCoord[2].toFixed(2);
-        this.bedTemp = bedTempValue.toFixed(1);
+        
+        this.bedEnabled = bedTempValue > -273.1;
+        this.bedTemp = this.bedEnabled ? bedTempValue.toFixed(1) : '';
+        
         this.bedStatus = statusName[this.printer.view.bedState];
         this.toolTemp = toolTempValue.toFixed(1);
         this.toolStatus = statusName[this.printer.view.toolState];
@@ -145,6 +149,7 @@ export class PageHome implements IScreen {
         this.ySelected = false;
         this.zSelected = false;
         this.bedSelected = false;
+        this.bedEnabled = false;
         this.toolSelected = false;
         this.homeAxis = 'XYZ';
     }
@@ -188,10 +193,12 @@ export class PageHome implements IScreen {
     }
 
     clickedBed() {
-        var selected = !this.bedSelected;
-        this.reset();
-        this.bedSelected = selected;
-        this.eventAggregator.publish(UI.MESSAGE_UI_UPDATE);
+        if (this.bedEnabled) {
+            var selected = !this.bedSelected;
+            this.reset();
+            this.bedSelected = selected;
+            this.eventAggregator.publish(UI.MESSAGE_UI_UPDATE);
+        }
     }
 
     clickedTool() {
