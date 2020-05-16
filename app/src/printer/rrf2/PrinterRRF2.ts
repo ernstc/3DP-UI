@@ -269,6 +269,10 @@ export class PrinterRRF2 extends Printer implements IPrinter  {
         return content;
     }
 
+    protected async _updateFile(name: string, content: string): Promise<void> {
+        // TODO
+    }
+
     protected async _loadFullStatus(): Promise<void> {
         var s: Models.FullStatus = await this._sendRequest('rr_status', {
             type: 2

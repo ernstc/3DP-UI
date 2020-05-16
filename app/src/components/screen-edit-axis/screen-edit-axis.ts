@@ -8,6 +8,10 @@ export class ScreenEditAxis {
     isHidden: boolean = true;
     axis: string;
 
+    private xValues: string[] = ['0.1', '1.0', '10.0', '50.0'];
+    private yValues: string[] = ['0.1', '1.0', '10.0', '50.0'];
+    private zValues: string[] = ['0.01', '0.1', '1.0', '10.0'];
+
     private values: string[] = ['0.1', '1.0', '10.0', '50.0'];
     private selectedValue: string = '10.0';
     private value: number = 10;
@@ -16,6 +20,14 @@ export class ScreenEditAxis {
         private printer: IPrinter
     ) 
     { }
+
+    attached() {
+        this.values = 
+            this.axis == 'x' ? this.xValues :
+            this.axis == 'y' ? this.yValues :
+            this.axis == 'z' ? this.zValues :
+            [];
+    }
 
     clickedValue(v: string) {
         this.selectedValue = v;

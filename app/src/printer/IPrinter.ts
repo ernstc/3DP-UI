@@ -18,6 +18,7 @@ export abstract class IPrinter
     abstract loadMacros(path: string): Promise<void>;
     abstract loadGCodeFiles(path: string): Promise<void>;
     abstract getFileContent(name: string): Promise<string>;
+    abstract updateFileContent(name: string, content: string): Promise<void>;
     abstract getCurrentJobFile(): Promise<GCodeFile>;
     abstract runMacro(name: string): Promise<void>;
     abstract simulatePrinting(name: string): Promise<void>;
@@ -48,4 +49,5 @@ export abstract class IPrinter
     abstract loadMeshBedCompensation(): Promise<void>;
     abstract disableBedCompensation(): Promise<void>;
     abstract getHeightMap(): Promise<HeightMap>;
+    abstract setZHeight(zHeight: number, save?: boolean): Promise<void>;
 }

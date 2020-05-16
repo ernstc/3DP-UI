@@ -25,8 +25,9 @@ export abstract class Printer implements IPrinter {
     protected abstract _loadFileList(path: string, page?: number): Promise<PrinterFilesList>;
     protected abstract _loadFiles(path: string, page?: number): Promise<PrinterFiles>;
     protected abstract _downloadFile(name: string): Promise<string>;
+    protected abstract _updateFile(name: string, content: string): Promise<void>;
     protected abstract _loadFileInfo(name?: string): Promise<GCodeFile>;
-    protected abstract _sendGCode(gcode): Promise<void>;
+    protected abstract _sendGCode(gcode: string): Promise<void>;
     protected abstract _loadFullStatus(): Promise<void>;
 
 
@@ -59,6 +60,10 @@ export abstract class Printer implements IPrinter {
 
     async getFileContent(name: string): Promise<string> {
         return await this._downloadFile(name);
+    }
+
+    async updateFileContent(name: string, content: string): Promise<void> {
+        await this._updateFile(name, content);
     }
 
     async getCurrentJobFile(): Promise<GCodeFile> {
@@ -279,5 +284,12 @@ export abstract class Printer implements IPrinter {
         map.geometry = geometry;
         map.points = points;
         return map;
+    }
+
+    async setZHeight(zHeight: number, save: boolean = true): Promise<void> {
+        if (save)
+            this._sendGCode(`G31 Z${zHeight.toFixed(2)}\nM500 P31`);
+        else
+            this._sendGCode(`G31 Z${zHeight.toFixed(2)}`);
     }
 }

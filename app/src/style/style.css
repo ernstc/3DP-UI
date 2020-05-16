@@ -776,9 +776,10 @@ body {
 #screenNumericKeypad table td.result:hover {
   background-color: transparent;
 }
-#screenSettings .button.zoffset .unit {
-  font-size: 30px;
-  margin-top: 7px;
+#screenSettings .button.zheight .status {
+  font-size: 20px;
+  font-weight: normal;
+  margin-top: -10px;
 }
 #screenSettings .button.language .value {
   font-family: 'Open Sans', sans-serif;

@@ -365,8 +365,12 @@ export class PrinterRRF3 extends Printer implements IPrinter {
         return content;
     }
 
-    protected async _sendGCode(gcode) {
-        var replayMessage = await this._sendRequest('POST', 'machine/code', gcode, 'text/plain;charset=UTF-8');
+    protected async _updateFile(name: string, content: string): Promise<void> {
+        await this._sendRequest('PUT', 'machine/file/' + encodeURIComponent(name), <any>content, 'text/plain;charset=UTF-8', undefined, false);
+    }
+
+    protected async _sendGCode(gcode: string) {
+        var replayMessage = await this._sendRequest('POST', 'machine/code', <any>gcode, 'text/plain;charset=UTF-8');
         if (typeof replayMessage === 'string') {
             var errors = replayMessage
                 .trim()
