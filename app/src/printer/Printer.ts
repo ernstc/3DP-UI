@@ -136,12 +136,12 @@ export abstract class Printer implements IPrinter {
     }
 
     async extrude(length: number, speed: number): Promise<void> {
-        var command = 'M120\M83\nG1 E' + length + ' F' + (speed * 60) + '\nM121';
+        var command = 'M120\nM83\nG1 E' + length + ' F' + (speed * 60) + '\nM121';
         await this._sendGCode(command);
     }
 
     async retract(length: number, speed: number): Promise<void> {
-        var command = 'M120\M83\nG1 E' + (-length) + ' F' + (speed * 60) + '\nM121';
+        var command = 'M120\nM83\nG1 E' + (-length) + ' F' + (speed * 60) + '\nM121';
         await this._sendGCode(command);
     }
 
