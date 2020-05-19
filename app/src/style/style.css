@@ -708,8 +708,8 @@ body {
   position: relative;
   cursor: pointer;
 }
-#screenEditAxis .button-backward:hover,
-#screenEditAxis .button-forward:hover {
+#screenEditAxis .button-backward:hover:not(.disabled),
+#screenEditAxis .button-forward:hover:not(.disabled) {
   border-color: rgba(255, 255, 255, 0.8);
   background-color: rgba(255, 255, 255, 0.15);
 }
@@ -721,6 +721,11 @@ body {
   right: 0;
   top: 111px;
   width: auto;
+}
+#screenEditAxis .button-backward.disabled,
+#screenEditAxis .button-forward.disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 #screenEditAxis .button-backward {
   border-radius: 50% 0 0 50%;

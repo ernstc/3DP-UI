@@ -100,7 +100,8 @@ export class App {
             this.pageHome.updateStatus();
             this.pageSettings.updateStatus();
             this.pageJob.updateStatus();
-            this.screenEditTool.updateStatus();
+            this.screenEditAxis.updateStatus();
+            this.screenEditTool.updateStatus();            
             this.screenMoveTool.updateStatus();
             this.screenEditBed.updateStatus();
             this.screenEditBedMesh.updateStatus();
@@ -113,6 +114,7 @@ export class App {
                     case 2: this.pageJob.updateStatus(); break;
                 }
                 if (!this.screenEditTool.isHidden) this.screenEditTool.updateStatus();
+                if (!this.screenEditAxis.isHidden) this.screenEditAxis.updateStatus();
                 if (!this.screenMoveTool.isHidden) this.screenMoveTool.updateStatus();
                 if (!this.screenEditBed.isHidden) this.screenEditBed.updateStatus();
                 if (!this.screenEditBedMesh.isHidden) this.screenEditBedMesh.updateStatus();

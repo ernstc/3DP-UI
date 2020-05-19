@@ -1,10 +1,10 @@
-import {autoinject} from 'aurelia-framework';
+import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import * as data from './chart-data';
 import { Chart } from 'chart.js';
-import { App }  from '../../app';
+import { App } from '../../app';
 import { IScreen } from '../../IScreen';
-import { IPrinter } from '../../printer';
+import { IPrinter, PrinterStatusEnum } from '../../printer';
 import * as UI from '../../ui-messages';
 
 
@@ -21,7 +21,7 @@ class TempData {
 export class PageHome implements IScreen {
 
     private graphTemperatures: HTMLCanvasElement;
-    
+
     private chart: Chart;
     private chartData: any;
 
@@ -47,12 +47,13 @@ export class PageHome implements IScreen {
     yHomed: boolean = true;
     zHomed: boolean = true;
     homeNeeded: boolean = false;
+    homeEnabled: boolean = true;
 
     private MAX_TEMPS = 1200;
 
     private bedTemps: TempData[] = [];
     private toolTemps: TempData[] = [];
-  
+
 
 
     constructor(
@@ -64,7 +65,7 @@ export class PageHome implements IScreen {
     }
 
     attached() {
-        this.setGraphTemp();        
+        this.setGraphTemp();
     }
 
     setGraphTemp() {
@@ -76,8 +77,8 @@ export class PageHome implements IScreen {
         this.xHomed = this.printer.view.axesHomed[0] == 1;
         this.yHomed = this.printer.view.axesHomed[1] == 1;
         this.zHomed = this.printer.view.axesHomed[2] == 1;
-
         this.homeNeeded = !(this.xHomed && this.yHomed && this.zHomed);
+        this.homeEnabled = this.printer.view.printerStatus != PrinterStatusEnum.processing;
 
         var bedTempValue = this.printer.view.bedCurrentTemp;
         var toolTempValue = this.printer.view.toolCurrentTemp;
@@ -85,10 +86,10 @@ export class PageHome implements IScreen {
         this.x = this.printer.view.axisCoord[0].toFixed(2);
         this.y = this.printer.view.axisCoord[1].toFixed(2);
         this.z = this.printer.view.axisCoord[2].toFixed(2);
-        
+
         this.bedEnabled = bedTempValue > -273.1;
         this.bedTemp = this.bedEnabled ? bedTempValue.toFixed(1) : '';
-        
+
         this.bedStatus = statusName[this.printer.view.bedState];
         this.toolTemp = toolTempValue.toFixed(1);
         this.toolStatus = statusName[this.printer.view.toolState];
@@ -98,14 +99,14 @@ export class PageHome implements IScreen {
         var t: number;
 
         this.bedTemps.push({
-            x: new Date(now), 
+            x: new Date(now),
             y: bedTempValue
         });
         t = now;
         while (this.bedTemps.length < this.MAX_TEMPS) {
             t = t - 300;
             this.bedTemps.push({
-                x: new Date(t), 
+                x: new Date(t),
                 y: bedTempValue
             });
         }
@@ -114,14 +115,14 @@ export class PageHome implements IScreen {
         }
 
         this.toolTemps.push({
-            x: new Date(now), 
+            x: new Date(now),
             y: toolTempValue
         });
         t = now;
         while (this.toolTemps.length < this.MAX_TEMPS) {
             t = t - 300;
             this.toolTemps.push({
-                x: new Date(t), 
+                x: new Date(t),
                 y: toolTempValue
             });
         }
@@ -182,14 +183,16 @@ export class PageHome implements IScreen {
     }
 
     clickedHome() {
-        if (this.xSelected)
-            this.printer.homeAxis(true, false, false);
-        else if (this.ySelected)
-            this.printer.homeAxis(false, true, false);
-        else if (this.zSelected)
-            this.printer.homeAxis(false, false, true);
-        else
-            this.printer.homeAxis(true, true, true);
+        if (this.homeEnabled) {
+            if (this.xSelected)
+                this.printer.homeAxis(true, false, false);
+            else if (this.ySelected)
+                this.printer.homeAxis(false, true, false);
+            else if (this.zSelected)
+                this.printer.homeAxis(false, false, true);
+            else
+                this.printer.homeAxis(true, true, true);
+        }
     }
 
     clickedBed() {

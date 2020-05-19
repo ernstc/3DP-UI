@@ -848,7 +848,7 @@ body {
         position: relative;
         cursor: pointer;
 
-        &:hover {
+        &:hover:not(.disabled) {
             border-color: rgba(255, 255, 255, 0.8);
             background-color: rgba(255, 255, 255, 0.15);
         }
@@ -860,6 +860,11 @@ body {
             right: 0;
             top: 101px + @axis-buttons-height-delta;
             width: auto;
+        }
+
+        &.disabled {
+            opacity: 0.5;
+            cursor: default;
         }
     }
 

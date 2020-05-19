@@ -13,7 +13,7 @@
                 <span class="label">Z</span>
                 <span class="value">${z}</span>
             </div>
-            <div class="button square home ${homeNeeded ? 'default' : ''}" click.delegate="clickedHome()">
+            <div class="button square home ${homeNeeded ? 'default' : ''} ${homeEnabled ? '' : 'disabled'}" click.delegate="clickedHome()">
                 <i class="icon-home"></i>
                 <span class="label">${homeAxis}</span>
             </div>

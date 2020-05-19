@@ -1,5 +1,5 @@
 import { autoinject } from 'aurelia-framework';
-import { IPrinter } from '../../printer';
+import { IPrinter, PrinterStatusEnum } from '../../printer';
 
 
 class Axis {
@@ -14,6 +14,7 @@ type AxisName = 'x' | 'y' | 'z';
 export class ScreenEditAxis {
 
     isHidden: boolean = true;
+    axesEnabled: boolean = true;
 
     private xValues: string[] = ['0.1', '1.0', '10.0', '50.0'];
     private yValues: string[] = ['0.1', '1.0', '10.0', '50.0'];
@@ -54,6 +55,10 @@ export class ScreenEditAxis {
         private printer: IPrinter
     ) 
     { }
+
+    updateStatus() {
+        this.axesEnabled = this.printer.view.printerStatus != PrinterStatusEnum.processing;
+    }
     
     clickedValue(v: string) {
         this.axes[this._axis].selectedValue = v;
@@ -62,21 +67,25 @@ export class ScreenEditAxis {
     }
 
     clickedMoveBackward() {
-        if (this._axis == 'x')
-            this.printer.moveAxisRelative(-this.value);
-        else if (this._axis == 'y')
-            this.printer.moveAxisRelative(null, -this.value);
-        else if (this._axis == 'z')
-            this.printer.moveAxisRelative(null, null, -this.value);
+        if (this.axesEnabled) {
+            if (this._axis == 'x')
+                this.printer.moveAxisRelative(-this.value);
+            else if (this._axis == 'y')
+                this.printer.moveAxisRelative(null, -this.value);
+            else if (this._axis == 'z')
+                this.printer.moveAxisRelative(null, null, -this.value);
+        }
     }
 
     clickedMoveForward() {
-        if (this._axis == 'x')
-            this.printer.moveAxisRelative(this.value);
-        else if (this._axis == 'y')
-            this.printer.moveAxisRelative(null, this.value);
-        else if (this._axis == 'z')
-            this.printer.moveAxisRelative(null, null, this.value);
+        if (this.axesEnabled) {
+            if (this._axis == 'x')
+                this.printer.moveAxisRelative(this.value);
+            else if (this._axis == 'y')
+                this.printer.moveAxisRelative(null, this.value);
+            else if (this._axis == 'z')
+                this.printer.moveAxisRelative(null, null, this.value);
+        }
     }
 
 }

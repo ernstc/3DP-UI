@@ -6,10 +6,10 @@
             </div>
         </div>
         <div class="buttons-row">
-            <div class="button-backward" click.delegate="clickedMoveBackward()">
+            <div class="button-backward ${axesEnabled ? '' : 'disabled'}" click.delegate="clickedMoveBackward()">
                 <i class="icon-move-left"></i>
             </div>
-            <div class="button-forward" click.delegate="clickedMoveForward()">
+            <div class="button-forward ${axesEnabled ? '' : 'disabled'}" click.delegate="clickedMoveForward()">
                 <i class="icon-move-right"></i>
             </div>
         </div>
