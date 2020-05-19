@@ -34,6 +34,10 @@ export let chartData = {
                 fontSize: 22
             }
         },
+
+        tooltips: {
+            enabled: false
+        },
         
         scales: {                
             yAxes: [{
