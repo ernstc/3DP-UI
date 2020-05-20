@@ -54,30 +54,9 @@ export class PageSettings implements IScreen {
     }
 
     async updateZHeight(zHeight: number) {
-        const zHeightRegEx = /(?<=G31(\s[A-Y]-?\d+(\.\d+)?)*\sZ)(?<zheight>-?\d+(\.\d+)?)/m;
-        const configOverrideFile = '0:/sys/config-override.g';
-
         if (zHeight < 0) zHeight = 0;
         else if (zHeight > 5) zHeight = 5;
-        await this.printer.setZHeight(zHeight, false);
-
-        /*
-        * The code below is a work around for a bug in the RepRapFirmware 3 / Duet Software Framework
-        * https://github.com/dc42/RepRapFirmware/issues/400
-        * This code should be removed once the bug has been resolved.
-        */
-        var config = await this.printer.getFileContent(configOverrideFile);
-        let command = zHeightRegEx.exec(config);
-
-        var currentZHeight: string;
-        if (command.groups.zheight != undefined) currentZHeight = command.groups.zheight;
-
-        config = 
-            config.substr(0, command.index) + 
-            zHeight.toFixed(2) + 
-            config.substr(command.index + currentZHeight.length);
-
-        await this.printer.updateFileContent(configOverrideFile, config);
+        await this.printer.setZHeight(zHeight, true);
     }
 
 }

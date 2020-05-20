@@ -18,8 +18,7 @@ export abstract class Printer implements IPrinter {
 
     constructor(
         protected eventAggregator: EventAggregator
-    )
-    { }
+    ) { }
 
 
     protected abstract _loadFileList(path: string, page?: number): Promise<PrinterFilesList>;
@@ -29,6 +28,60 @@ export abstract class Printer implements IPrinter {
     protected abstract _loadFileInfo(name?: string): Promise<GCodeFile>;
     protected abstract _sendGCode(gcode: string): Promise<void>;
     protected abstract _loadFullStatus(): Promise<void>;
+
+
+    private _onceExecutions: { [command: string]: any } = {};
+
+    private _executeCommandOnce(command: string, delay: number) {
+        // Cancel any previous execution scheduled on the same command.
+        var scheduledExecution = this._onceExecutions[command];
+        if (scheduledExecution != undefined) clearTimeout(scheduledExecution);
+        // Schedule a new execution for the command.
+        this._onceExecutions[command] = setTimeout(() => {
+            this._sendGCode(command);
+            delete this._onceExecutions[command];
+        }, delay);
+    }
+
+
+    protected delay(ms: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve();
+            }, ms);
+        });
+    }
+
+
+    // Compares the version strings. Returns:
+    // -1 if v1 < v2
+    //  0 if v1 = v2
+    //  1 if v1 > v2
+    private _compareVersions(v1: string, v2: string): number {
+        var parts1: number[] = v1.split('.').map(s => parseInt(s));
+        var parts2: number[] = v2.split('.').map(s => parseInt(s));
+        var max = Math.min(parts1.length, parts2.length);
+        for (var i = 0; i < max; i++) {
+            if (parts1[i] > parts2[i])
+                return 1;
+            if (parts1[i] < parts2[i])
+                return -1
+        }
+        if (parts1.length > max) {
+            for (var i = max; i < parts1.length; i++) {
+                if (parts1[i] > 0)
+                    return 1;
+            }
+        }
+        else if (parts2.length > max) {
+            for (var i = max; i < parts2.length; i++) {
+                if (parts2[i] > 0)
+                    return -1;
+            }
+        }
+        // The versions are equal.
+        return 0;
+    }
 
 
     async loadFilaments(): Promise<void> {
@@ -230,15 +283,15 @@ export abstract class Printer implements IPrinter {
     }
 
     async getHeightMap(): Promise<HeightMap> {
-        var mapFile = await this._downloadFile('0:/sys/heightmap.csv');        
+        var mapFile = await this._downloadFile('0:/sys/heightmap.csv');
         if (mapFile == undefined)
             return null;
 
         var lines = mapFile.split('\n');
-        var statistics: number[] = lines[0].split(',').slice(1).map(e => 
+        var statistics: number[] = lines[0].split(',').slice(1).map(e =>
             parseFloat(e.substr(e.lastIndexOf(' ')))
         );
-        
+
         var geometry: HeightMapGeometry = new HeightMapGeometry();
         var geometryLabels = lines[1].split(',');
         var geometryValues = lines[2].split(',');
@@ -253,7 +306,7 @@ export abstract class Printer implements IPrinter {
             var x = geometry.xmin;
             var zPoints = lines[i + 3].trim().split(',').map(n => parseFloat(n));
             for (let zIndex = 0; zIndex < zPoints.length; zIndex++) {
-                const z = zPoints[zIndex];                
+                const z = zPoints[zIndex];
                 var point: number[] = [x, y, z];
                 points.push(point);
                 x += geometry.xspacing;
@@ -287,9 +340,33 @@ export abstract class Printer implements IPrinter {
     }
 
     async setZHeight(zHeight: number, save: boolean = true): Promise<void> {
-        if (save)
-            this._sendGCode(`G31 Z${zHeight.toFixed(2)}\nM500 P31`);
-        else
-            this._sendGCode(`G31 Z${zHeight.toFixed(2)}`);
+        await this._sendGCode(`G31 Z${zHeight.toFixed(2)}`);
+        if (save) {
+            if (this._compareVersions(this.view.firmwareVersion, '3.1.1') >= 0) {
+                this._executeCommandOnce('M500 P31', 1000);
+            }
+            else {
+                /*
+                * The code below is a work around for a bug in the RepRapFirmware 3.1.0 and below
+                * https://github.com/dc42/RepRapFirmware/issues/400
+                */
+                const zHeightRegEx = /(?<=G31(\s[A-Y]-?\d+(\.\d+)?)*\sZ)(?<zheight>-?\d+(\.\d+)?)/m;
+                const configOverrideFile = '0:/sys/config-override.g';
+
+                var config = await this.getFileContent(configOverrideFile);
+                let command = zHeightRegEx.exec(config);
+
+                var currentZHeight: string;
+                if (command.groups.zheight != undefined) currentZHeight = command.groups.zheight;
+
+                config =
+                    config.substr(0, command.index) +
+                    zHeight.toFixed(2) +
+                    config.substr(command.index + currentZHeight.length);
+
+                await this.updateFileContent(configOverrideFile, config);
+            }
+        }
     }
+
 }
