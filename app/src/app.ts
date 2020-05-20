@@ -105,6 +105,7 @@ export class App {
             this.screenMoveTool.updateStatus();
             this.screenEditBed.updateStatus();
             this.screenEditBedMesh.updateStatus();
+            if (this.printer.view.printerStatus == PrinterStatusEnum.processing) this.showJobPage();
         }
         else {
             if (this.screenModel.isHidden || this.pageIndex == 2) {
