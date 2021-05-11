@@ -6,8 +6,8 @@ import { Line2 } from 'three/examples/jsm/lines/Line2';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 import { OrbitControls } from 'libraries/OrbitControls';
-import { isArray } from 'util';
 import { IScreen } from 'IScreen';
+import { BufferAttribute } from 'three';
 
 
 
@@ -97,27 +97,17 @@ export class ScreenEditBedMesh implements IScreen {
 
     private container: HTMLElement;
     private legend: HTMLCanvasElement;
-    private tooltip: any;
 
     private hasHelpers: boolean;
     private ready: boolean;
-
-    private tooltipX: number;
-    private tooltipY: number;
-    private tooltipZ: number;
-    private tooltopVisible: boolean = false;
-    private tooltipPosX: number;
-    private tooltipPosY: number;
-
 
     private scene: THREE.Scene;
     private camera: THREE.Camera;
     private renderer: THREE.WebGLRenderer;
     private controls: OrbitControls;
-    private lastIntersection: THREE.Intersection;
 
 
-    private meshGeometry: THREE.Geometry;
+    private meshGeometry: THREE.BufferGeometry;
     private meshPlane: THREE.Mesh;
     private meshIndicators: THREE.Mesh[];
 
@@ -177,7 +167,7 @@ export class ScreenEditBedMesh implements IScreen {
             });
             meshes.forEach(m => this.disposeMesh(m));
 
-            this.scene.dispose();
+            //this.scene.dispose();
             this.renderer.dispose();
 
             for (var i = this.container.children.length - 1; i >= 0 ; i--) {
@@ -188,7 +178,6 @@ export class ScreenEditBedMesh implements IScreen {
             this.camera = undefined;
             this.renderer = undefined;
             this.controls = undefined;
-            this.lastIntersection = undefined;
             this.meshIndicators = undefined;
             this.meshPlane = undefined;
             this.meshGeometry = undefined;
@@ -203,7 +192,7 @@ export class ScreenEditBedMesh implements IScreen {
         if (mesh.material instanceof THREE.Material) {
             mesh.material.dispose();
         }
-        else if (isArray(mesh.material)) {
+        else if (Array.isArray(mesh.material)) {
             mesh.material.forEach(m => m.dispose());
         }
         mesh.geometry.dispose();
@@ -242,11 +231,10 @@ export class ScreenEditBedMesh implements IScreen {
 
             this.meshGeometry = null;
             this.meshIndicators = null;
-            this.lastIntersection = null;
         }
 
         // Generate stats
-        let xMin, xMax, yMin, yMax;
+        let xMin: number, xMax: number, yMin: number, yMax: number;
 
         let numPoints: number = 0;
         let minDiff: number = undefined;
@@ -287,7 +275,7 @@ export class ScreenEditBedMesh implements IScreen {
         this.scene.add(this.meshPlane);
 
         // Make indicators and add them
-        this.meshIndicators = this.generateIndicators(this.meshGeometry, numPoints, scaleZ, indicatorColor, indicatorOpacity);
+        this.meshIndicators = this.generateIndicators(this.meshGeometry, numPoints, xMin, xMax, yMin, yMax, scaleZ, indicatorColor, indicatorOpacity);
         this.meshIndicators.forEach(function (indicator) {
             this.add(indicator);
         }, this.scene);
@@ -355,28 +343,40 @@ export class ScreenEditBedMesh implements IScreen {
     }
 
 
-    private setFaceColors(geometry: THREE.Geometry, scaleZ: number, maxVisualizationZ: number) {
-        for (let i = 0; i < geometry.faces.length; i++) {
-            const face = geometry.faces[i];
-            const a = this.getColorByZ(geometry.vertices[face.a].z / scaleZ, maxVisualizationZ);
-            const b = this.getColorByZ(geometry.vertices[face.b].z / scaleZ, maxVisualizationZ);
-            const c = this.getColorByZ(geometry.vertices[face.c].z / scaleZ, maxVisualizationZ);
+    private setFaceColors(geometry: THREE.BufferGeometry, scaleZ: number, maxVisualizationZ: number): void {
 
-            if (face.vertexColors.length < 3) {
-                face.vertexColors = [a, b, c];
-            } else {
-                face.vertexColors[0].copy(a);
-                face.vertexColors[1].copy(b);
-                face.vertexColors[2].copy(c);
-            }
+        const vertices = geometry.getAttribute('position');
+        const faces = geometry.getIndex();
+        let colors = new Float32Array(vertices.array.length);
+
+        for (let i = 0; i < faces.count; i++) {
+            const faceA = faces.getX(i), faceB = faces.getY(i), faceC = faces.getZ(i);
+            const a = this.getColorByZ(vertices.getZ(faceA) / scaleZ, maxVisualizationZ);
+            const b = this.getColorByZ(vertices.getZ(faceB) / scaleZ, maxVisualizationZ);
+            const c = this.getColorByZ(vertices.getZ(faceC) / scaleZ, maxVisualizationZ);
+
+            let vIndex = faceA * 3;
+            colors[vIndex] = a.r;
+            colors[++vIndex] = a.g;
+            colors[++vIndex] = a.b;
+
+            vIndex = faceB * 3;
+            colors[vIndex] = b.r;
+            colors[++vIndex] = b.g;
+            colors[++vIndex] = b.b;
+
+            vIndex = faceC * 3;
+            colors[vIndex] = c.r;
+            colors[++vIndex] = c.g;
+            colors[++vIndex] = c.b;
         }
-        geometry.colorsNeedUpdate = true;
+        geometry.setAttribute('color', new BufferAttribute(colors, 3));
     }
 
 
-    private getNearestZ(points: number[][], x: number, y: number, maxDelta?: number) {
+    private getNearestZ(points: number[][], x: number, y: number, maxDelta?: number): number {
         // Get the point that is closest to X+Y
-        let point, delta;
+        let point: number[], delta: number;
         for (let i = 0; i < points.length; i++) {
             const deltaNew = Math.sqrt(Math.pow(x - points[i][0], 2) + Math.pow(y - points[i][1], 2));
             if (delta === undefined || deltaNew < delta) {
@@ -396,33 +396,39 @@ export class ScreenEditBedMesh implements IScreen {
 
 
     // Generate a mesh geometry
-    private generateMeshGeometry(probePoints, xMin, xMax, yMin, yMax, scaleZ): THREE.Geometry {
+    private generateMeshGeometry(probePoints: number[][], xMin: number, xMax: number, yMin: number, yMax: number, scaleZ: number): THREE.BufferGeometry {
         /** Cartesian 3-point and 5-point bed compensation (deprecated) **/
 
         if (probePoints.length === 3 || probePoints.length === 5) {
-            const geometry: any = new THREE.Geometry();
-            geometry.xMin = xMin;
-            geometry.xMax = xMax;
-            geometry.yMin = yMin;
-            geometry.yMax = yMax;
+            const geometry = new THREE.BufferGeometry();
+            
+            let points: Float32Array = new Float32Array(probePoints.length * 3);
 
             // Generate vertices
-            for (let i = 0; i < probePoints.length; i++) {
+            for (let i = 0, pointIndex = 0; i < probePoints.length; i++) {
                 const x = (probePoints[i][0] - xMin) / (xMax - xMin) - 0.5;
                 const y = (probePoints[i][1] - yMin) / (yMax - yMin) - 0.5;
                 const z = probePoints[i][2] * scaleZ;
 
-                geometry.vertices.push(new THREE.Vector3(x, y, z));
+                points[pointIndex++] = x;
+                points[pointIndex++] = y;
+                points[pointIndex++] = z;
             }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(points, 3));
 
             // Generate faces
             if (probePoints.length === 3) {
-                geometry.faces.push(new THREE.Face3(0, 1, 2));
+                geometry.setIndex([
+                    0, 1, 2
+                ]);
             } else {
-                geometry.faces.push(new THREE.Face3(0, 1, 4));
-                geometry.faces.push(new THREE.Face3(1, 2, 4));
-                geometry.faces.push(new THREE.Face3(2, 3, 4));
-                geometry.faces.push(new THREE.Face3(3, 0, 4));
+                geometry.setIndex([
+                    0, 1, 4,
+                    1, 2, 4,
+                    2, 3, 4,
+                    3, 0, 4
+                ]);
             }
 
             return geometry;
@@ -455,36 +461,38 @@ export class ScreenEditBedMesh implements IScreen {
         const planeWidth = (width < height) ? Math.abs(width / height) : 1.0;
         const planeHeight = (height < width) ? Math.abs(height / width) : 1.0;
 
-        const planeGeometry: any = new THREE.PlaneGeometry(planeWidth, planeHeight, xPoints.length - 1, yPoints.length - 1);
-        planeGeometry.xMin = xMin;
-        planeGeometry.xMax = xMax;
-        planeGeometry.yMin = yMin;
-        planeGeometry.yMax = yMax;
-
-        for (let i = planeGeometry.vertices.length - 1; i >= 0; i--) {
-            const x = ((planeGeometry.vertices[i].x / planeWidth) + 0.5) * width + xMin;
-            const y = ((planeGeometry.vertices[i].y / planeHeight) + 0.5) * height + yMin;
+        const planeGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, xPoints.length - 1, yPoints.length - 1);
+        
+        let vertices = planeGeometry.getAttribute('position');
+        
+        for (let i = vertices.count - 1; i >= 0; i--) {
+            const x = ((vertices.getX(i) / planeWidth) + 0.5) * width + xMin;
+            const y = ((vertices.getY(i) / planeHeight) + 0.5) * height + yMin;
             const z = this.getNearestZ(probePoints, x, y) * scaleZ;
 
-            planeGeometry.vertices[i].z = z;
+            vertices.setZ(i, z);
         }
 
-        // Add extra faces to each top row to avoid zig-zag lines (for round grids)
-        let yCurrent;
-        for (let i = 1; i < planeGeometry.vertices.length / 2; i++) {
-            const vertex = planeGeometry.vertices[i], prevVertex = planeGeometry.vertices[i - 1];
+        let facesIndexes: number[] = [];
 
-            if (!isNaN(prevVertex.z) && isNaN(vertex.z)) {
+        // Add extra faces to each top row to avoid zig-zag lines (for round grids)
+        let yCurrent: number;
+        for (let i = 1; i < vertices.count / 2; i++) {
+
+            const vertex = new THREE.Vector3(vertices.getX(i), vertices.getY(i), vertices.getZ(i));
+            const prev = new THREE.Vector3(vertices.getX(i - 1), vertices.getY(i - 1), vertices.getZ(i - 1));
+
+            if (!isNaN(prev.z) && isNaN(vertex.z)) {
                 var yPoint = vertex.y;
                 if (yCurrent === undefined || yCurrent > yPoint) {
                     // We are at the last defined point in this row
                     yCurrent = yPoint;
 
                     // Find the next two points below and below+right to this one
-                    let a, b;
-                    for (let k = i + 1; k < planeGeometry.vertices.length - 1; k++) {
-                        const nextVertex = planeGeometry.vertices[k];
-                        if (nextVertex.x === prevVertex.x && nextVertex.y === planeGeometry.vertices[k + 1].y) {
+                    let a: number, b: number;
+                    for (let k = i + 1; k < vertices.count - 1; k++) {
+                        const nextVertex = new THREE.Vector3(vertices.getX(k), vertices.getY(k), vertices.getZ(k));
+                        if (nextVertex.x === prev.x && nextVertex.y === vertices.getY(k + 1)) {
                             a = k;
                             b = k + 1;
                             break;
@@ -492,26 +500,27 @@ export class ScreenEditBedMesh implements IScreen {
                     }
 
                     // If that succeeds add a new face
-                    if (a !== undefined && !isNaN(planeGeometry.vertices[a].z) && !isNaN(planeGeometry.vertices[b].z)) {
-                        const face = new THREE.Face3(a, b, i - 1);
-                        planeGeometry.faces.push(face);
+                    if (a !== undefined && !isNaN(vertices.getZ(a)) && !isNaN(vertices.getZ(b))) {
+                        facesIndexes.push(a);
+                        facesIndexes.push(b);
+                        facesIndexes.push(i - 1);
                     }
                 }
             }
         }
 
         // Add extra faces to each bottom row to avoid zig-zag lines (for round grids)
-        let prevVertex;
-        for (let i = Math.floor(planeGeometry.vertices.length / 2); i < planeGeometry.vertices.length; i++) {
-            const vertex = planeGeometry.vertices[i];
+        let prevVertex: THREE.Vector3;
+        for (let i = Math.floor(vertices.count / 2); i < vertices.count; i++) {
+            const vertex = new THREE.Vector3(vertices.getX(i), vertices.getY(i), vertices.getZ(i));
 
             // Check if this is the first defined point in this row
             if (prevVertex !== undefined && prevVertex.y === vertex.y && isNaN(prevVertex.z) && !isNaN(vertex.z)) {
                 // Find the two points above and above+left to this one
-                let a, b;
+                let a: number, b: number;
                 for (let k = i - 1; k > 0; k--) {
-                    const prevVertex = planeGeometry.vertices[k];
-                    if (prevVertex.x === vertex.x && prevVertex.y === planeGeometry.vertices[k - 1].y) {
+                    const prevVertex = new THREE.Vector3(vertices.getX(k), vertices.getY(k), vertices.getZ(k));
+                    if (prevVertex.x === vertex.x && prevVertex.y === vertices.getY(k - 1)) {
                         a = k - 1;
                         b = k;
                         break;
@@ -519,19 +528,20 @@ export class ScreenEditBedMesh implements IScreen {
                 }
 
                 // If that succeeds add a new face
-                if (a !== undefined && !isNaN(planeGeometry.vertices[a].z) && !isNaN(planeGeometry.vertices[b].z)) {
-                    const face = new THREE.Face3(a, b, i);
-                    planeGeometry.faces.push(face);
+                if (a !== undefined && !isNaN(vertices.getZ(a)) && !isNaN(vertices.getZ(b))) {
+                    facesIndexes.push(a);
+                    facesIndexes.push(b);
+                    facesIndexes.push(i);
                 }
             }
             prevVertex = vertex;
         }
 
         // Remove all the points and faces that have invalid values
-        for (let i = planeGeometry.vertices.length - 1; i >= 0; i--) {
-            if (isNaN(planeGeometry.vertices[i].z)) {
+        /*for (let i = vertices.count - 1; i >= 0; i--) {
+            if (isNaN(vertices.getZ(i))) {
                 // Remove and rearrange the associated face(s)
-                for (let k = planeGeometry.faces.length - 1; k >= 0; k--) {
+                for (let k = vertices.count - 1; k >= 0; k--) {
                     const face = planeGeometry.faces[k];
                     if (face.a === i || face.b === i || face.c === i) {
                         planeGeometry.faces.splice(k, 1);
@@ -545,20 +555,17 @@ export class ScreenEditBedMesh implements IScreen {
                 // Remove this vertex
                 planeGeometry.vertices.splice(i, 1);
             }
-        }
+        }*/
 
         return planeGeometry;
     }
 
 
-    private translateGridPoint(meshGeometry, vector, scaleZ) {
-        let x, y;
-        if (meshGeometry.type === 'PlaneGeometry') {
-            x = (vector.x / meshGeometry.parameters.width + 0.5) * (meshGeometry.xMax - meshGeometry.xMin) + meshGeometry.xMin;
-            y = (vector.y / meshGeometry.parameters.height + 0.5) * (meshGeometry.yMax - meshGeometry.yMin) + meshGeometry.yMin;
-        } else if (meshGeometry.type === 'Geometry') {
-            x = (vector.x + 0.5) * (meshGeometry.xMax - meshGeometry.xMin) + meshGeometry.xMin;
-            y = (vector.y + 0.5) * (meshGeometry.yMax - meshGeometry.yMin) + meshGeometry.yMin;
+    private translateGridPoint(meshGeometry: THREE.BufferGeometry, vector: THREE.Vector3, xMin: number, xMax: number, yMin: number, yMax: number, scaleZ: number): THREE.Vector3 {
+        let x: number, y: number;
+        if (meshGeometry instanceof THREE.PlaneGeometry) {
+            x = (vector.x / meshGeometry.parameters.width + 0.5) * (xMax - xMin) + xMin;
+            y = (vector.y / meshGeometry.parameters.height + 0.5) * (yMax - yMin) + yMin;
         } else {
             throw new Error(`Unsupported geometry: ${meshGeometry.type}`);
         }
@@ -568,15 +575,17 @@ export class ScreenEditBedMesh implements IScreen {
 
 
     // Generate ball-style indicators
-    private generateIndicators(meshGeometry, numPoints, scaleZ, color, opacity): THREE.Mesh[] {
+    private generateIndicators(meshGeometry: THREE.BufferGeometry, numPoints: number, xMin: number, xMax: number, yMin: number, yMax: number, scaleZ: number, color: number, opacity: number): THREE.Mesh[] {
         let indicators: THREE.Mesh[] = [], centerPointGenerated = false;
 
-        for (let i = 0; i < meshGeometry.vertices.length; i++) {
+        let vertices = meshGeometry.getAttribute('position');
+
+        for (let i = 0; i < vertices.count; i++) {
             // Convert world coordinate to 'real' probe coordinates
-            const x = meshGeometry.vertices[i].x;
-            const y = meshGeometry.vertices[i].y;
-            const z = meshGeometry.vertices[i].z;
-            const trueProbePoint = this.translateGridPoint(meshGeometry, new THREE.Vector3(x, y, z), scaleZ);
+            const x = vertices.getX(i);
+            const y = vertices.getY(i);
+            const z = vertices.getZ(i);
+            const trueProbePoint = this.translateGridPoint(meshGeometry, new THREE.Vector3(x, y, z), xMin, xMax, yMin, yMax, scaleZ);
 
             // Skip center point if it already exists
             if (Math.sqrt(trueProbePoint.x * trueProbePoint.x + trueProbePoint.y * trueProbePoint.y) < pointTolerance) {
@@ -595,8 +604,7 @@ export class ScreenEditBedMesh implements IScreen {
                 sphereGeometry.applyMatrix4(new THREE.Matrix4().makeTranslation(x, y, z));
 
                 const material = new THREE.MeshBasicMaterial({ color, opacity, transparent: true });
-                const sphere: any = new THREE.Mesh(sphereGeometry, material);
-                sphere.coords = trueProbePoint;
+                const sphere = new THREE.Mesh(sphereGeometry, material);
 
                 indicators.push(sphere);
             }
@@ -608,7 +616,7 @@ export class ScreenEditBedMesh implements IScreen {
     //------------------------------------------------------------------------
 
     // Draw scale+legend next to the 3D control
-    private _drawLegend(canvas: HTMLCanvasElement, maxVisualizationZ: number) {
+    private _drawLegend(canvas: HTMLCanvasElement, maxVisualizationZ: number): void {
 
         const font1: string = '18px \'Open Sans\', sans-serif';
         const font2: string = '14px \'Open Sans\', sans-serif';

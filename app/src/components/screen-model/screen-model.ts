@@ -3,7 +3,6 @@ import { IPrinter } from '../../printer';
 import * as THREE from 'three';
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OrbitControls } from 'libraries/OrbitControls';
-import { isArray } from 'util';
 import { GCodeModel } from 'libraries/GCodeModel';
 
 
@@ -127,7 +126,7 @@ export class ScreenModel {
             });
             meshes.forEach(m => this.disposeMesh(m));
 
-            this.scene.dispose();
+            //this.scene.dispose();
             this.renderer.dispose();
 
             for (var i = this.container.children.length - 1; i >= 0; i--) {
@@ -148,7 +147,7 @@ export class ScreenModel {
         if (mesh.material instanceof THREE.Material) {
             mesh.material.dispose();
         }
-        else if (isArray(mesh.material)) {
+        else if (Array.isArray(mesh.material)) {
             mesh.material.forEach(m => m.dispose());
         }
         mesh.geometry.dispose();
