@@ -25,6 +25,7 @@ Thumbs.db
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.chrome
 
 # Dependencies
 node_modules

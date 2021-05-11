@@ -166,7 +166,7 @@ export class PrinterRRF3 extends Printer implements IPrinter {
 				if (lastDsfVersion !== _self.status.state.dsfVersion) {
 					location.reload(true);
 				}
-				resolve();
+				resolve(null);
 			}
 			socket.onerror = socket.onclose = function(e) {
                 _self.isOnline = false;

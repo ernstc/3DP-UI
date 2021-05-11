@@ -121,7 +121,9 @@ module.exports = ({ production } = {}, { extractCss, analyze, tests, hmr, port, 
         historyApiFallback: true,
         hot: hmr || project.platform.hmr,
         port: port || project.platform.port,
-        host: host
+        host: host,
+        sockHost: 'localprinter',
+        sockPort: 80
     },
     devtool: production ? 'nosources-source-map' : 'cheap-module-eval-source-map',
     module: {
