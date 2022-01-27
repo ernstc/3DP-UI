@@ -18,7 +18,7 @@
     "chart.js": "^2.9.3",
     "iscroll": "^5.2.0",
     "moment": "^2.25.3",
-    "three": "^0.125.0"
+    "three": "^0.137.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.149",
