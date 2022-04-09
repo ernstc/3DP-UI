@@ -17,7 +17,7 @@
     "aurelia-fetch-client": "^1.8.2",
     "chart.js": "^2.9.3",
     "iscroll": "^5.2.0",
-    "moment": "^2.25.3",
+    "moment": "^2.29.2",
     "three": "^0.125.0"
   },
   "devDependencies": {
